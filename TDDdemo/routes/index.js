@@ -7,10 +7,10 @@ router.get('/', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
-router.get('/tdddemo', function (req, res, next) {
-  var q = req.query;
-  console.log(q.username);
-  res.send(q)
+router.post('/tdddemo', function (req, res, next) {
+  var user = req.body;
+  // console.log(user);
+  res.status(200).send(user);
 });
 
 module.exports = router;
