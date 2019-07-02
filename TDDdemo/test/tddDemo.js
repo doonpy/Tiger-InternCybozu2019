@@ -12,15 +12,27 @@ let expect = chai.expect;
 chai.use(chaiHttp);
 //Our parent block
 
-
-describe('Validate', () => {
-  describe('#username', () => {
-    it('should have minimum length is 8 characters', (done) => {
+//TDD demo
+describe('User Infomation', () => {
+  //POST user info testing
+  describe('/POST user', () => {
+    it('expect username or password have minimum length is 8 characters', (done) => {
+      //Create example user infomation
+      let user = {
+        username: 'poonnguyen',
+        password: 'poondeptrai'
+      }
+      //Testing with POST testing
       chai.request(server)
-        .get('/tdddemo?username=poonneban')
-        .end((err, req, res) => {
-          var q = req.body;
-          expect(q).to.have.property('username').to.be.a('string').to.have.length.within(8, 100);
+        .post('/tdddemo')
+        .send(user)
+        .type('application/json')
+        .end((err, res) => {
+          if (err) return done(err);
+          let user = res.body;
+          // expect(req.body).to.have.property('username').to.be.a('string').to.have.length.within(8, 100);
+          // expect(req.body).to.have.property('password').to.be.a('string').to.have.length.within(8, 100);
+          assert.isTrue(user.username.length >= 8);
           done();
         });
     });
