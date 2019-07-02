@@ -36,5 +36,28 @@ describe('User Infomation', () => {
           done();
         });
     });
+
+
+    it('compare username to password', (done) => {
+      //Create example user infomation
+      let user = {
+        username: 'usernamedemo',
+        password: 'usernamev   DEMOkkkk'
+      }
+      //Testing with POST testing
+      chai.request(server)
+        .post('/tdddemo')
+        .send(user)
+        .type('application/json')
+        .end((err, res) => {
+          if (err) return done(err);
+          let user = res.body;
+          assert.strictEqual(user.password, user.username);
+         
+          done();
+        });
+    });
   });
+
+  
 });
