@@ -50,6 +50,7 @@ describe('api/user', () => {
         gender: 'male'
       });
       await user.save();
+
       chai.request(app)
         .get('/api/users/' + user._id)
         .end((err, res) => {
@@ -93,18 +94,42 @@ describe('api/user', () => {
         .post('/api/users')
         .send(user)
         .end((err, res) => {
-          expect(err).to.be.null;
-          expect(res.status).to.equal(200);
-          expect(res.body).to.have.property('_id');
-          expect(res.body).to.have.property('email', user.email)
-            .to.be.a('string').to.have.include('@')
+          expect(err)
+            .to.be.null;
+          expect(res.status)
+            .to.equal(200);
+          expect(res.body)
+            .to.have.property('_id');
+          expect(res.body)
+            .to.have.property('email', user.email)
+            .to.be.a('string')
+            .to.have.include('@')
             .to.have.length.within(5, 255);
-          expect(res.body).to.have.property('gender', user.gender)
+          expect(res.body)
+            .to.have.property('gender', user.gender)
             .to.be.a('string').to.match(/^male|female/)
             .to.have.length.within(4, 6);
-          expect(res.body).to.have.property('name', user.name)
+          expect(res.body)
+            .to.have.property('name', user.name)
             .to.be.a('string')
             .to.have.length.within(3, 50);
+        });
+    });
+
+    it('should return 400 error when valid object email is passed but existed', async () => {
+      const user = new User({
+        name: 'test',
+        email: 'test@gmail.com',
+        gender: 'male'
+      });
+      await user.save();
+
+      await chai.request(app)
+        .post('/api/users')
+        .send(user)
+        .end((err, res) => {
+          expect(err).to.be.null;
+          expect(res.status).to.be.equal(400);
         });
     });
   });
