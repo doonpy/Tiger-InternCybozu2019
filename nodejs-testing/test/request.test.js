@@ -76,9 +76,11 @@ describe('api/user', () => {
 
       expect(res.status).to.equal(200);
       expect(res.body).to.have.property('_id');
+      expect(res.body).to.have.property('email').to.be.a('string').to.have.include('@');
+      expect(res.body).to.have.property('gender').to.be.a('string').to.match(/^(male)|(female)/);
       expect(res.body).to.have.property('name', 'test');
     });
-  })
+  });
 
   //PUT method testing
   describe('PUT /:id', () => {
