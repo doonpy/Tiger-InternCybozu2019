@@ -10,7 +10,7 @@ router.get('/', function (req, res, next) {
 router.post('/tdddemo', function (req, res, next) {
   var user = req.body;
   // console.log(user);
-  res.status(200).send(user);
+  res.send(user);
 });
 
 module.exports = router;
