@@ -66,7 +66,7 @@ describe('api/user', () => {
   //POST method testing
   describe('POST /', () => {
     it('should return user when the all request body is valid', async () => {
-      const res = await chai.request(app)
+      const req = await chai.request(app)
         .post('/api/users')
         .send({
           name: 'test',
@@ -74,11 +74,11 @@ describe('api/user', () => {
           gender: 'male'
         });
 
-      expect(res.status).to.equal(200);
-      expect(res.body).to.have.property('_id');
-      expect(res.body).to.have.property('email').to.be.a('string').to.have.include('@');
-      expect(res.body).to.have.property('gender').to.be.a('string').to.match(/^(male)|(female)/);
-      expect(res.body).to.have.property('name', 'test');
+      expect(req.status).to.equal(200);
+      expect(req.body).to.have.property('_id');
+      expect(req.body).to.have.property('email').to.be.a('string').to.have.include('@');
+      expect(req.body).to.have.property('gender').to.be.a('string').to.match(/^(male)|(female)/);
+      expect(req.body).to.have.property('name', 'test');
     });
   });
 
@@ -127,13 +127,25 @@ describe('api/user', () => {
       });
       await user.save();
 
-      let res = await chai.request(app).delete('/api/users/' + user._id);
-      expect(res.status).to.be.equal(200);
-      setTimeout(async () => {
-        res = await request(app).get('/api/users/' + user._id);
-        expect(res.status).to.be.equal(404);
-      }, 5000);
+      chai.request(app).delete('/api/users/' + user._id).end((err, res)=>{
+        expect(res.status).to.be.equal(200);
+         chai.request(app).get('/api/users/' + user._id).end((err, res)=>{
+          expect(res.status).to.be.equal(404);
+         });
+      });
+    });
 
+    it('should return 400 error when valid object id is passed but does not exist', async () => {
+      const user = new User({
+        name: 'test',
+        email: 'test2@gmail.com',
+        gender: 'male'
+      });
+      await user.save();
+
+      chai.request(app).delete('/api/users/2222222222').end((err,res)=>{
+        expect(res.status).to.be.equal(400);
+      });
     });
   });
 });
