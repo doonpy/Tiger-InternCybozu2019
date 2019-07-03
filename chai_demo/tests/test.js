@@ -17,15 +17,15 @@ describe('Students',()=>{
     });
 
     // Test to get single student record
-    it("should get a single student record",async () => {
+    it("should get a single student record",(done) => {
         const id = 1;
-        awake (chai.request(app)
+        chai.request(app)
             .get(`/${id}`)
             .end((err, res) => {
                 res.should.have.status(200);
                 res.body.should.be.a('object');
-             });
-        );
+            })
+        done();
     });
     
    // Test to get single student record
