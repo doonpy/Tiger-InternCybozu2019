@@ -103,6 +103,19 @@ describe('api/user', () => {
       expect(res.status).to.equal(200);
       expect(res.body).to.have.property('name', 'newTest');
     });
+    it('return 404 if id does not exist ', ()=>{
+      const res =  chai.request(app)
+        .put('/api/users/4')
+        .send({
+          name: 'newTest',
+          email: 'newemail@gmail.com',
+          gender: 'male'
+        }).end((err,res)=>{
+          expect(err).to.be.null;
+          expect(res.status).to.equal(404);
+        });
+      //expect(res.body).to.have.property('name', 'newTest');
+    });
   });
 
   //DELETE method testing
