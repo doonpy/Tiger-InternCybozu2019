@@ -1,8 +1,11 @@
 const { User } = require('../models/user.model');
-const request = require('supertest');
-const expect = require('chai').expect;
+const chai = require('chai');
+const expect = chai.expect;
 const app = require('../app');
+const chaiHttp = require('chai-http');
+chai.use(chaiHttp);
 var cache = new Array();
+
 
 describe('api/user', () => {
   //backup database before testing
@@ -29,7 +32,7 @@ describe('api/user', () => {
 
       await User.insertMany(users);
       console.log(users);
-      const res = await request(app).get('/api/users');
+      const res = await chai.request(app).get('/api/users');
       expect(res.status).to.equal(200);
       expect(res.body.length).to.equal(2);
     });
@@ -44,18 +47,18 @@ describe('api/user', () => {
         gender: 'male'
       });
       await user.save();
-      const res = await request(app).get('/api/users/' + user._id);
+      const res = await chai.request(app).get('/api/users/' + user._id);
       expect(res.status).to.equal(200);
       expect(res.body).to.have.property('name', user.name);
     });
 
     it('should return 400 error when invalid object id is passed', async () => {
-      const res = await request(app).get('/api/users/1');
+      const res = await chai.request(app).get('/api/users/1');
       expect(res.status).to.equal(400);
     });
 
     it('should return 404 error when valid object id is passed but does not exist', async () => {
-      const res = await request(app).get('/api/users/111111111111');
+      const res = await chai.request(app).get('/api/users/111111111111');
       expect(res.status).to.equal(404);
     });
   });
@@ -63,7 +66,7 @@ describe('api/user', () => {
   //POST method testing
   describe('POST /', () => {
     it('should return user when the all request body is valid', async () => {
-      const res = await request(app)
+      const res = await chai.request(app)
         .post('/api/users')
         .send({
           name: 'test',
@@ -87,7 +90,7 @@ describe('api/user', () => {
       });
       await user.save();
 
-      const res = await request(app)
+      const res = await chai.request(app)
         .put('/api/users/' + user._id)
         .send({
           name: 'newTest',
@@ -110,7 +113,7 @@ describe('api/user', () => {
       });
       await user.save();
 
-      const res = await request(app).delete('/api/users/' + user._id);
+      const res = await chai.request(app).delete('/api/users/' + user._id);
       expect(res.status).to.be.equal(200);
     });
 
@@ -122,7 +125,7 @@ describe('api/user', () => {
       });
       await user.save();
 
-      let res = await request(app).delete('/api/users/' + user._id);
+      let res = await chai.request(app).delete('/api/users/' + user._id);
       expect(res.status).to.be.equal(200);
       setTimeout(async () => {
         res = await request(app).get('/api/users/' + user._id);
