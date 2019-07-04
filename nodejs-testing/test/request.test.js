@@ -4,22 +4,10 @@ const expect = chai.expect;
 const app = require('../app');
 const chaiHttp = require('chai-http');
 chai.use(chaiHttp);
-var cache = new Array();
-
 
 describe('api/user', () => {
-  //backup database before testing
-  before(async () => {
-    cache = await User.find({});
-  });
-
   beforeEach(async () => {
     await User.deleteMany({});
-  })
-
-  //restore database after all test are completed
-  after(async () => {
-    await User.insertMany(cache);
   })
 
   //GET / method testing
@@ -31,12 +19,15 @@ describe('api/user', () => {
       ];
 
       await User.insertMany(users);
-      chai.request(app)
+
+      await chai.request(app)
         .get('/api/users')
-        .end((err, res) => {
-          expect(err).to.be.null;
+        .then(res => {
           expect(res.status).to.equal(200);
           expect(res.body.length).to.equal(2);
+        })
+        .catch(err => {
+          expect(err).to.be.null;
         });
     });
   });
@@ -51,32 +42,37 @@ describe('api/user', () => {
       });
       await user.save();
 
-      chai.request(app)
+      await chai.request(app)
         .get('/api/users/' + user._id)
-        .end((err, res) => {
-          expect(err).to.be.null;
+        .then(res => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.property('name', user.name);
+        })
+        .catch(err => {
+          expect(err).to.be.null;
         });
     });
 
-    it('should return 400 error when invalid object id is passed', () => {
-      chai.request(app)
+    it('should return 400 error when invalid object id is passed', async () => {
+      await chai.request(app)
         .get('/api/users/1')
-        .end((err, res) => {
-          expect(err).to.be.null;
+        .then(res => {
           expect(res.status).to.equal(400);
+        })
+        .catch(err => {
+          expect(err).to.be.null;
         });
 
     });
 
-    it('should return 404 error when valid object id is passed but does not exist', () => {
-      chai.request(app)
+    it('should return 404 error when valid object id is passed but does not exist', async () => {
+      await chai.request(app)
         .get('/api/users/111111111111')
-        .end((err, res) => {
-          expect(err).to.be.null;
+        .then(res => {
           expect(res.status).to.equal(404);
-
+        })
+        .catch(err => {
+          expect(err).to.be.null;
         });
     });
   });
@@ -93,9 +89,7 @@ describe('api/user', () => {
       chai.request(app)
         .post('/api/users')
         .send(user)
-        .end((err, res) => {
-          expect(err)
-            .to.be.null;
+        .then(res => {
           expect(res.status)
             .to.equal(200);
           expect(res.body)
@@ -113,6 +107,9 @@ describe('api/user', () => {
             .to.have.property('name', user.name)
             .to.be.a('string')
             .to.have.length.within(3, 50);
+        })
+        .catch(err => {
+          expect(err).to.be.null;
         });
     });
 
@@ -127,9 +124,12 @@ describe('api/user', () => {
       await chai.request(app)
         .post('/api/users')
         .send(user)
-        .end((err, res) => {
+        .then(res => {
+          expect(res.status)
+            .to.be.equal(400);
+        })
+        .catch(err => {
           expect(err).to.be.null;
-          expect(res.status).to.be.equal(400);
         });
     });
   });
@@ -150,13 +150,15 @@ describe('api/user', () => {
         gender: 'male'
       };
 
-      chai.request(app)
+      await chai.request(app)
         .put('/api/users/' + user._id)
         .send(newUser)
-        .end((err, res) => {
-          expect(err).to.be.null;
+        .then(res => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.property('name', newUser.name);
+        })
+        .catch(err => {
+          expect(err).to.be.null;
         });
     });
   });
@@ -171,11 +173,14 @@ describe('api/user', () => {
       });
       await user.save();
 
-      chai.request(app)
+      await chai.request(app)
         .delete('/api/users/' + user._id)
-        .end((err, res) => {
+        .then(res => {
+          expect(res.status)
+            .to.be.equal(200);
+        })
+        .catch(err => {
           expect(err).to.be.null;
-          expect(res.status).to.be.equal(200);
         });
 
     });
@@ -188,25 +193,48 @@ describe('api/user', () => {
       });
       await user.save();
 
-      chai.request(app).delete('/api/users/' + user._id).end((err, res)=>{
-        expect(res.status).to.be.equal(200);
-         chai.request(app).get('/api/users/' + user._id).end((err, res)=>{
-          expect(res.status).to.be.equal(404);
-         });
-      });
+      await chai.request(app)
+        .delete('/api/users/' + user._id)
+        .then(res => {
+          expect(res.status)
+            .to.be.equal(200);
+        })
+        .catch(err => {
+          expect(err).to.be.null;
+        });
+
+      await chai.request(app)
+        .get('/api/users/' + user._id)
+        .then(res => {
+          expect(res.status)
+            .to.be.equal(404);
+        })
+        .catch(err => {
+          expect(err)
+            .to.be.null;
+        });
     });
 
     it('should return 400 error when valid object id is passed but does not exist', async () => {
       const user = new User({
         name: 'test',
-        email: 'test2@gmail.com',
+        email: 'test@gmail.com',
         gender: 'male'
       });
       await user.save();
 
-      chai.request(app).delete('/api/users/2222222222').end((err,res)=>{
-        expect(res.status).to.be.equal(400);
-      });
+      await chai.request(app)
+        .delete('/api/users/aa')
+        .then(res => {
+          expect(err)
+            .to.be.null;
+          expect(res.status)
+            .to.be.equal(400);
+        })
+        .catch(err => {
+          expect(err)
+            .to.be.null;
+        });
     });
   });
 });
