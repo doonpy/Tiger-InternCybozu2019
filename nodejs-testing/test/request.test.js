@@ -22,7 +22,7 @@ describe('api/user', () => {
     await User.insertMany(cache);
   })
 
-  //get method testing
+  //GET / method testing
   describe('GET /', () => {
     it('should return all users', async () => {
       const users = [
@@ -31,14 +31,17 @@ describe('api/user', () => {
       ];
 
       await User.insertMany(users);
-      console.log(users);
-      const res = await chai.request(app).get('/api/users');
-      expect(res.status).to.equal(200);
-      expect(res.body.length).to.equal(2);
+      chai.request(app)
+        .get('/api/users')
+        .end((err, res) => {
+          expect(err).to.be.null;
+          expect(res.status).to.equal(200);
+          expect(res.body.length).to.equal(2);
+        });
     });
   });
 
-  //GET method testing
+  //GET /:id method testing
   describe('GET /:id', () => {
     it('should return a user if valid id is passed', async () => {
       const user = new User({
@@ -47,38 +50,87 @@ describe('api/user', () => {
         gender: 'male'
       });
       await user.save();
-      const res = await chai.request(app).get('/api/users/' + user._id);
-      expect(res.status).to.equal(200);
-      expect(res.body).to.have.property('name', user.name);
+
+      chai.request(app)
+        .get('/api/users/' + user._id)
+        .end((err, res) => {
+          expect(err).to.be.null;
+          expect(res.status).to.equal(200);
+          expect(res.body).to.have.property('name', user.name);
+        });
     });
 
-    it('should return 400 error when invalid object id is passed', async () => {
-      const res = await chai.request(app).get('/api/users/1');
-      expect(res.status).to.equal(400);
+    it('should return 400 error when invalid object id is passed', () => {
+      chai.request(app)
+        .get('/api/users/1')
+        .end((err, res) => {
+          expect(err).to.be.null;
+          expect(res.status).to.equal(400);
+        });
+
     });
 
-    it('should return 404 error when valid object id is passed but does not exist', async () => {
-      const res = await chai.request(app).get('/api/users/111111111111');
-      expect(res.status).to.equal(404);
+    it('should return 404 error when valid object id is passed but does not exist', () => {
+      chai.request(app)
+        .get('/api/users/111111111111')
+        .end((err, res) => {
+          expect(err).to.be.null;
+          expect(res.status).to.equal(404);
+
+        });
     });
   });
 
   //POST method testing
   describe('POST /', () => {
-    it('should return user when the all request body is valid', async () => {
-      const res = await chai.request(app)
-        .post('/api/users')
-        .send({
-          name: 'test',
-          email: 'test@gmail.com',
-          gender: 'male'
-        });
+    it('should return user when the all request body is valid', () => {
+      const user = {
+        name: 'test',
+        email: 'test@gmail.com',
+        gender: 'male'
+      }
 
-      expect(res.status).to.equal(200);
-      expect(res.body).to.have.property('_id');
-      expect(res.body).to.have.property('email').to.be.a('string').to.have.include('@');
-      expect(res.body).to.have.property('gender').to.be.a('string').to.match(/^(male)|(female)/);
-      expect(res.body).to.have.property('name', 'test');
+      chai.request(app)
+        .post('/api/users')
+        .send(user)
+        .end((err, res) => {
+          expect(err)
+            .to.be.null;
+          expect(res.status)
+            .to.equal(200);
+          expect(res.body)
+            .to.have.property('_id');
+          expect(res.body)
+            .to.have.property('email', user.email)
+            .to.be.a('string')
+            .to.have.include('@')
+            .to.have.length.within(5, 255);
+          expect(res.body)
+            .to.have.property('gender', user.gender)
+            .to.be.a('string').to.match(/^male|female/)
+            .to.have.length.within(4, 6);
+          expect(res.body)
+            .to.have.property('name', user.name)
+            .to.be.a('string')
+            .to.have.length.within(3, 50);
+        });
+    });
+
+    it('should return 400 error when valid object email is passed but existed', async () => {
+      const user = new User({
+        name: 'test',
+        email: 'test@gmail.com',
+        gender: 'male'
+      });
+      await user.save();
+
+      await chai.request(app)
+        .post('/api/users')
+        .send(user)
+        .end((err, res) => {
+          expect(err).to.be.null;
+          expect(res.status).to.be.equal(400);
+        });
     });
   });
 
@@ -92,16 +144,20 @@ describe('api/user', () => {
       });
       await user.save();
 
-      const res = await chai.request(app)
-        .put('/api/users/' + user._id)
-        .send({
-          name: 'newTest',
-          email: 'newemail@gmail.com',
-          gender: 'male'
-        });
+      const newUser = {
+        name: 'newTest',
+        email: 'newemail@gmail.com',
+        gender: 'male'
+      };
 
-      expect(res.status).to.equal(200);
-      expect(res.body).to.have.property('name', 'newTest');
+      chai.request(app)
+        .put('/api/users/' + user._id)
+        .send(newUser)
+        .end((err, res) => {
+          expect(err).to.be.null;
+          expect(res.status).to.equal(200);
+          expect(res.body).to.have.property('name', newUser.name);
+        });
     });
     it('return 404 if id does not exist ', ()=>{
       const res =  chai.request(app)
@@ -128,8 +184,13 @@ describe('api/user', () => {
       });
       await user.save();
 
-      const res = await chai.request(app).delete('/api/users/' + user._id);
-      expect(res.status).to.be.equal(200);
+      chai.request(app)
+        .delete('/api/users/' + user._id)
+        .end((err, res) => {
+          expect(err).to.be.null;
+          expect(res.status).to.be.equal(200);
+        });
+
     });
 
     it('should return 404 when deleted user is requested', async () => {
@@ -140,13 +201,19 @@ describe('api/user', () => {
       });
       await user.save();
 
-      let res = await chai.request(app).delete('/api/users/' + user._id);
-      expect(res.status).to.be.equal(200);
-      setTimeout(async () => {
-        res = await request(app).get('/api/users/' + user._id);
-        expect(res.status).to.be.equal(404);
-      }, 5000);
+      chai.request(app)
+        .delete('/api/users/' + user._id)
+        .end((err, res) => {
+          expect(err).to.be.null;
+          expect(res.status).to.be.equal(200);
+        });
 
+      chai.request(app)
+        .get('/api/users/' + user._id)
+        .end((err, res) => {
+          expect(err).to.be.null;
+          expect(res.status).to.be.equal(404);
+        });
     });
   });
 });
