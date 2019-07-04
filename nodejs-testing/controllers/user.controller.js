@@ -15,14 +15,22 @@ module.exports.getUser = async (req, res) => {
     return res.send(user);
 };
 
-module.exports.createUser = async (req, res) => {
+module.exports.createUser = (req, res) => {
     let user = new User({
         name: req.body.name,
         email: req.body.email,
         gender: req.body.gender
     });
-    await user.save();
-    return res.send(user);
+
+    User.find({ email: user.email }, async (err, data) => {
+        if (err) return err;
+        if (data.length > 0)
+            res.status(400).send('Email is existed');
+        else {
+            await user.save();
+            res.send(user);
+        }
+    });
 };
 
 module.exports.updateUser = async (req, res) => {
@@ -39,5 +47,5 @@ module.exports.updateUser = async (req, res) => {
 module.exports.deleteUser = async (req, res) => {
     let userId = req.params.id;
     await User.findByIdAndDelete(userId);
-        return res.send("User deleted");
+    return res.send("User deleted");
 }

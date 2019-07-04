@@ -7,7 +7,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 //Connect with mongoDB Atlas
-const connectionString = 'mongodb+srv://tiger:tiger@pokebiz-exjmn.azure.mongodb.net/tdddemo?retryWrites=true&w=majority';
+// const connectionString = 'mongodb+srv://tiger:tiger@pokebiz-exjmn.azure.mongodb.net/tdddemo?retryWrites=true&w=majority';
+const connectionString = 'mongodb://localhost:27017/tdddemo';
+
 mongoose.connect(connectionString, {
     useNewUrlParser: true,
     useCreateIndex: true,
