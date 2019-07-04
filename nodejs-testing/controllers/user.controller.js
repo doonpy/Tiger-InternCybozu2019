@@ -16,7 +16,6 @@ module.exports.getUser = async (req, res) => {
 };
 
 module.exports.createUser = async (req, res) => {
-    console.log(req.body);
     let user = new User({
         name: req.body.name,
         email: req.body.email,
