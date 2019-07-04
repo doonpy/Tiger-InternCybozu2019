@@ -10,6 +10,10 @@ describe('api/user', () => {
     await User.deleteMany({});
   })
 
+  after(async () => {
+    await User.deleteMany({});
+  })
+
   //GET / method testing
   describe('GET /', () => {
     it('should return all users', async () => {
