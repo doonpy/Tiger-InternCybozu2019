@@ -204,7 +204,7 @@ describe('api/user', () => {
       });
       await user.save();
 
-      chai.request(app).delete('/api/users/2222222222').end((err,res)=>{
+      await chai.request(app).delete('/api/users/2222222222').end((err,res)=>{
         expect(res.status).to.be.equal(400);
       });
     });
