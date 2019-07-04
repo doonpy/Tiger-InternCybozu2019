@@ -188,19 +188,25 @@ describe('api/user', () => {
       });
       await user.save();
 
-      chai.request(app)
-        .delete('/api/users/' + user._id)
-        .end((err, res) => {
-          expect(err).to.be.null;
-          expect(res.status).to.be.equal(200);
-        });
-
-      chai.request(app)
-        .get('/api/users/' + user._id)
-        .end((err, res) => {
-          expect(err).to.be.null;
+      chai.request(app).delete('/api/users/' + user._id).end((err, res)=>{
+        expect(res.status).to.be.equal(200);
+         chai.request(app).get('/api/users/' + user._id).end((err, res)=>{
           expect(res.status).to.be.equal(404);
-        });
+         });
+      });
+    });
+
+    it('should return 400 error when valid object id is passed but does not exist', async () => {
+      const user = new User({
+        name: 'test',
+        email: 'test2@gmail.com',
+        gender: 'male'
+      });
+      await user.save();
+
+      chai.request(app).delete('/api/users/2222222222').end((err,res)=>{
+        expect(res.status).to.be.equal(400);
+      });
     });
   });
 });

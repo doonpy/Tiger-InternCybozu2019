@@ -39,5 +39,5 @@ module.exports.updateUser = async (req, res) => {
 module.exports.deleteUser = async (req, res) => {
     let userId = req.params.id;
     await User.findByIdAndDelete(userId);
-    return res.send("User deleted");
+        return res.send("User deleted");
 }
