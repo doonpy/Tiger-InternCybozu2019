@@ -36,5 +36,25 @@ describe('User Infomation', () => {
           done();
         });
     });
+
+    it('assert equal username', (done) => {
+      //Create example user infomation
+      let user = {
+        username: '3',
+        password: 'poondeptrai'
+      }
+      //Testing with POST testing
+      chai.request(server)
+        .post('/tdddemo')
+        .send(user)
+        .type('application/json')
+        .end((err, res) => {
+          if (err) return done(err);
+          let user = res.body;
+          assert.notEqual(user.username,'34','these username are not equal');
+          assert.Equal(user.username,'3','these username are not equal');
+          done();
+        });
+    });
   });
 });
