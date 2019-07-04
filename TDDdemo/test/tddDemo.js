@@ -52,8 +52,8 @@ describe('User Infomation', () => {
         .end((err, res) => {
           if (err) return done(err);
           let user = res.body;
-          assert.strictEqual(user.password, user.username);
-         
+          assert.notEqual(user.username,'34','these username are not equal');
+          assert.Equal(user.username,'3','these username are not equal');
           done();
         });
     });
