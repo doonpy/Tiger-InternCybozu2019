@@ -37,11 +37,12 @@ describe('User Infomation', () => {
         });
     });
 
-    it('assert equal username', (done) => {
+
+    it('compare username to password', (done) => {
       //Create example user infomation
       let user = {
-        username: '3',
-        password: 'poondeptrai'
+        username: 'usernamedemo',
+        password: 'usernamev   DEMOkkkk'
       }
       //Testing with POST testing
       chai.request(server)
@@ -57,4 +58,6 @@ describe('User Infomation', () => {
         });
     });
   });
+
+  
 });
